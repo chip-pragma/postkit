@@ -1,6 +1,7 @@
 import abc
 import postkit
-from postkit.core.config import ServiceConfig
+from postkit.service import ServiceConfig
+from postkit.exceptions import LoaderError
 
 
 class BaseLoader(abc.ABC):
@@ -15,7 +16,7 @@ class BaseLoader(abc.ABC):
     def split_config_name(cls, name: str):
         s = tuple(name.split('.'))
         if len(s) != 4:
-            raise ValueError(f'Incorrect config name "{name}"')
+            raise LoaderError(f'Incorrect config name "{name}"')
         return s
 
     @abc.abstractmethod

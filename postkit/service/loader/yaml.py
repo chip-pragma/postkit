@@ -2,8 +2,9 @@ import typing as T
 from pathlib import Path
 import yaml
 from furl import furl
-from postkit.core.loader.base import BaseLoader
-from postkit.core.config import ServiceConfig
+from postkit.exceptions import LoaderError
+from postkit.service.loader import BaseLoader
+from postkit.service import ServiceConfig
 
 
 class _K:
@@ -19,14 +20,14 @@ class _K:
 def _key_field(d: dict, key: str):
     value = d.get(key)
     if not value:
-        raise KeyError(f'Field <{key}> not defined')
+        raise LoaderError(f'Field <{key}> not defined')
     return value
 
 
 def _value_field(d: dict, key: str, name: str):
     value = d.get(key)
     if not value:
-        raise KeyError(f'{name} <{key}> not found')
+        raise LoaderError(f'{name} <{key}> not found')
     return value
 
 
@@ -74,7 +75,7 @@ class YamlLoader(BaseLoader):
 
         files: dict = level.get(_K.FILE)
         if files:
-            for name, file in files:
+            for name, file in files.items():
                 file_path = Path(file)
                 if not file_path.is_absolute():
                     file_path = self.root_dir / file_path

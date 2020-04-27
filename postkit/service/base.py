@@ -1,8 +1,8 @@
 import typing as T
-from postkit.core.config import ServiceConfig
+import requests as _r
 from furl import furl
-from postkit.core.route import Route
-from postkit.core.prep import BasePrep
+from postkit.service import ServiceConfig, Route, BasePrep
+from postkit.service.loader import BaseLoader
 
 
 class BaseService:
@@ -10,9 +10,9 @@ class BaseService:
     __tag__ = ''
 
     @classmethod
-    def config(cls, host: str, env: str):
-        return '.'.join(
-            [cls.__api__, cls.__tag__, host, env]
+    def load_config(cls, loader: BaseLoader, host: str, env: str) -> ServiceConfig:
+        return loader.load_config(
+            '.'.join([cls.__api__, cls.__tag__, host, env])
         )
 
     def __init__(self, config: ServiceConfig):
@@ -34,11 +34,12 @@ class BaseService:
                query: T.Mapping[str, str] = None,
                headers: T.Mapping[str, str] = None,
                json: T.Mapping[str, T.Any] = None,
-               preps: T.Iterable[BasePrep] = None) -> Route:
+               preps: T.Iterable[BasePrep] = None,
+               handler: T.Callable[[_r.Response], T.Any] = None):
         # args
+        path = '' if path is None else path
         query = {} if query is None else query
         headers = {} if headers is None else headers
-        json = {} if json is None else json
         preps = [] if not preps else preps
 
         # url
@@ -49,16 +50,21 @@ class BaseService:
         for p in preps:
             headers = p.header(headers)
             query = p.query(query)
-            json = p.json(json)
 
         # query
         url_obj.query.set(query)
+
+        # json
+        if json is not None:
+            headers['Content-Type'] = 'application/json'
 
         # route
         route = Route(
             method=method,
             url=url_obj.url,
             headers=headers,
-            json=json)
+            json=json,
+            handler=handler)
 
+        # cast for type hints
         return route
