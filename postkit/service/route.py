@@ -6,12 +6,12 @@ TResponse = T.TypeVar('TResponse')
 
 
 class Route(T.Generic[TResponse]):
-    def __init__(self, method: str, url: str, headers: dict = None, json: str = None,
+    def __init__(self, method: str, url: str, headers: dict = None, json_: str = None,
                  *, handler: T.Callable[[_r.Response], TResponse] = None):
         self.method = method
         self.url = url
         self.headers = headers
-        self.json = json
+        self.json = json_
 
         self.handler = self._default_handler if handler is None else handler
 
