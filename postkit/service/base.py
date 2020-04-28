@@ -22,7 +22,6 @@ class BaseService:
             raise NameError(f'Wrong environment <{config}> used for service <{self}>')
 
         self.config = config
-        self.preps = {}
 
     def __str__(self):
         return f'{self.__api__}.{self.__tag__}'
@@ -32,27 +31,26 @@ class BaseService:
                method: str,
                path: str = None,
                *,
-               query: T.Mapping[str, str] = None,
+               query: T.Mapping[str, T.Any] = None,
                headers: T.Mapping[str, str] = None,
                json: T.Mapping[str, T.Any] = None,
-               prep_names: T.Iterable[str] = None,
+               preps: T.Iterable[BasePrep] = None,
                handler: T.Callable[[_r.Response], T.Any] = None):
         # args
         path = '' if path is None else path
         query = {} if query is None else query
         headers = {} if headers is None else headers
-        prep_names = [] if not prep_names else prep_names
+        preps = [] if not preps else preps
 
         # url
         url_obj = self.config.urls[url_name].copy()
         url_obj.path /= path
 
         # preps
-        for pn in prep_names:
-            prep: BasePrep = self.preps.get(pn)
-            if prep:
-                headers = prep.header(headers)
-                query = prep.query(query)
+        for p in preps:
+            if p:
+                headers = p.header(headers)
+                query = p.query(query)
 
         # query
         url_obj.query.set(query)
