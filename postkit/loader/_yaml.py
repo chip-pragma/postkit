@@ -1,10 +1,12 @@
-import typing as T
+import typing as t
 from pathlib import Path
+
 import yaml
 from furl import furl
-from postkit.exceptions import LoaderError
-from postkit.service.loader import BaseLoader
-from postkit.service import ServiceConfig
+
+from postkit.exceptions import LoadError
+from postkit.loader import BaseLoader
+from postkit._config import ServiceConfig
 
 
 class _K:
@@ -20,19 +22,19 @@ class _K:
 def _key_field(d: dict, key: str):
     value = d.get(key)
     if not value:
-        raise LoaderError(f'Field <{key}> not defined')
+        raise LoadError(f'Field <{key}> not defined')
     return value
 
 
 def _value_field(d: dict, key: str, name: str):
     value = d.get(key)
     if not value:
-        raise LoaderError(f'{name} <{key}> not found')
+        raise LoadError(f'{name} <{key}> not found')
     return value
 
 
 class YamlLoader(BaseLoader):
-    def __init__(self, file: T.Union[str, Path]):
+    def __init__(self, file: t.Union[str, Path]):
         super().__init__()
 
         file_path = Path(file) if isinstance(file, str) else file
