@@ -2,10 +2,10 @@ import setuptools
 
 setuptools.setup(
     name='postkit',
-    version='0.1.0',
+    version='0.2.2b',
     author='Ivan Cheltsov',
     author_email='chip.pragma@gmail.com',
-    packages=setuptools.find_packages('.'),
+    packages=setuptools.find_packages(),
     install_requires=[
         'furl',
         'requests',

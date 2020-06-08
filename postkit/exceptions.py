@@ -9,7 +9,7 @@ class RequireError(PostkitError):
     pass
 
 
-class LoaderError(PostkitError):
+class LoadError(PostkitError):
     pass
 
 
@@ -18,3 +18,7 @@ class BadResponse(PostkitError):
         message = f'HTTP code = {resp.status_code}' if message is None else message
         super().__init__(message)
         self.response = resp
+
+
+class HandleError(PostkitError):
+    pass
