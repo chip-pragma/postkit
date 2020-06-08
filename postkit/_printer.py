@@ -11,6 +11,7 @@ class RoutePrinter:
     STATE_UNDEFINED = -1
     STATE_REQUEST = 0
     STATE_RESPONSE = 1
+    STATE_CUSTOM = 2
 
     def __init__(self, head=True, curl=True, headers=False, json=True):
         self.head = head
@@ -46,9 +47,16 @@ class RoutePrinter:
             self._label('[JSON]', self.STATE_RESPONSE)
             try:
                 data = response.json()
-                print(json.dumps(data, indent=2))
+                print(json.dumps(data, indent=2, ensure_ascii=False))
             except ValueError:
                 print(response.content)
+
+    def print(self, *lines, caption='USER PRINT'):
+        if self.STATE_CUSTOM != self._state:
+            self._label(f'[{caption}]', self.STATE_CUSTOM)
+
+        for line in lines:
+            print(line)
 
     def error(self, exc: Exception):
         self._label('[EXCEPTION]', self.STATE_RESPONSE)
@@ -63,6 +71,8 @@ class RoutePrinter:
                 sep = '='
             elif self.STATE_RESPONSE == state:
                 sep = '-'
+            elif self.STATE_CUSTOM == state:
+                sep = '~'
 
         print(f'{sep * length} {label}')
         self._state = state
