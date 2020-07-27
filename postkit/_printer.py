@@ -34,7 +34,7 @@ class RoutePrinter:
 
     def response(self, response: r.Response):
         if self.head:
-            self._label(f'[RESPONSE]', self.STATE_RESPONSE)
+            self._label(f'[{response.status_code} - RESPONSE]', self.STATE_RESPONSE)
 
         if self.headers:
             self._label('[HEADERS]', self.STATE_RESPONSE)
